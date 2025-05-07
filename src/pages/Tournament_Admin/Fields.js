@@ -1,59 +1,76 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Fields.css';
 
 const Fields = () => {
-  const [fields, setFields] = useState([
-    { id: 'F001', name: 'North Field', assignedVenue: '', available: true },
-    { id: 'F002', name: 'Main Stadium', assignedVenue: 'Venue A', available: false },
-    { id: 'F003', name: 'South Field', assignedVenue: '', available: true }
+  const [venues, setVenues] = useState([]);
+  const [fields] = useState([
+    { id: 'Field 1' },
+    { id: 'Field 2' },
+    { id: 'Field 3' }
   ]);
 
-  const venues = ['Venue A', 'Venue B', 'Venue C'];
+  useEffect(() => {
+    fetch('http://localhost:3001/venues')
+      .then(res => res.json())
+      .then(data => setVenues(data))
+      .catch(err => console.error('Error fetching venues:', err));
+  }, []);
 
-  const handleAssign = (fieldId, venueName) => {
-    const updated = fields.map(field =>
-      field.id === fieldId
-        ? { ...field, assignedVenue: venueName, available: false }
-        : field
-    );
-    setFields(updated);
-    alert(`✅ ${venueName} assigned to ${fieldId}`);
-    // TODO: POST or PATCH to backend to update venue_description
+  const handleAssign = async (venueId, fieldId) => {
+    try {
+      const res = await fetch(`http://localhost:3001/venues/${venueId}/assign-field`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fieldId })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(`✅ Field ${fieldId} assigned to Venue ID ${venueId}`);
+        setVenues(prev =>
+          prev.map(v => v.venue_id === venueId ? { ...v, venue_description: fieldId } : v)
+        );
+      } else {
+        alert(data.error || 'Assignment failed');
+      }
+    } catch (err) {
+      console.error('Assignment error:', err);
+      alert('Server error while assigning field.');
+    }
   };
 
   return (
     <div className="fields-container">
-      <h2>Manage Soccer Fields</h2>
+      <h2>Assign Fields to Venues</h2>
       <table className="fields-table">
         <thead>
           <tr>
-            <th>Field ID</th>
-            <th>Field Name</th>
-            <th>Assigned Venue</th>
+            <th>Venue ID</th>
+            <th>Venue Name</th>
+            <th>Current Field</th>
             <th>Status</th>
-            <th>Assign to Venue</th>
+            <th>Assign Field</th>
           </tr>
         </thead>
         <tbody>
-          {fields.map(field => (
-            <tr key={field.id}>
-              <td>{field.id}</td>
-              <td>{field.name}</td>
-              <td>{field.assignedVenue || '-'}</td>
+          {venues.map(venue => (
+            <tr key={venue.venue_id}>
+              <td>{venue.venue_id}</td>
+              <td>{venue.venue_name}</td>
+              <td>{venue.venue_description || '-'}</td>
               <td>
-                <span className={field.available ? 'available' : 'assigned'}>
-                  {field.available ? 'Available' : 'Assigned'}
+                <span className={venue.venue_status === 'Y' ? 'available' : 'inactive'}>
+                  {venue.venue_status === 'Y' ? 'Active' : 'Inactive'}
                 </span>
               </td>
               <td>
                 <select
-                  onChange={(e) => handleAssign(field.id, e.target.value)}
-                  disabled={!field.available}
+                  onChange={(e) => handleAssign(venue.venue_id, e.target.value)}
                   defaultValue=""
                 >
-                  <option value="" disabled>Select Venue</option>
-                  {venues.map(v => (
-                    <option key={v} value={v}>{v}</option>
+                  <option value="" disabled>Select Field</option>
+                  {fields.map(field => (
+                    <option key={field.id} value={field.id}>{field.id}</option>
                   ))}
                 </select>
               </td>

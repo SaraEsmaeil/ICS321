@@ -3,7 +3,7 @@ import './SidebarNav.css';
 import { Link } from 'react-router-dom'; 
 import logo from '../assets/LogoHome.png';
 import {
-  FaTrophy, FaThList, FaUserPlus, FaUserTie, FaUserCheck,
+  FaTrophy, FaThList, FaUserTie, FaUserCheck,
   FaCalendarAlt, FaClipboardList, FaRegIdCard, FaStar,
   FaTrash, FaMapMarkedAlt, FaEye, FaSignOutAlt // <- Added logout icon
 } from 'react-icons/fa';
@@ -25,9 +25,7 @@ const SidebarNav = () => {
         <li>
           <Link to="/admin/add-team"><FaThList /> <span>Add Team</span></Link>
         </li>
-        <li>
-          <Link to="/admin/add-player"><FaUserPlus /> <span>Add Player</span></Link>
-        </li>
+        
         <li>
           <Link to="/admin/assign-captain"><FaUserTie /> <span>Assign Captain</span></Link>
         </li>

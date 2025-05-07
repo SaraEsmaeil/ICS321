@@ -4,24 +4,23 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const app = express();
+
+// ✅ Middleware
 app.use(cors());
 app.use(express.json());
 
-// 👉 Routes mounting
+// ✅ Routes
 app.use('/tournaments', require('./routes/tournaments'));
 app.use('/teams', require('./routes/teams'));
-app.use('/players', require('./routes/players'));
-app.use('/matches', require('./routes/matches'));
-app.use('/cards', require('./routes/cards'));
-app.use('/stats', require('./routes/stats'));
-app.use('/fields', require('./routes/fields'));
-app.use('/join-requests', require('./routes/joinRequests'));
+app.use('/join_requests', require('./routes/join_requests')); // ← Added this line
+app.use('/venues', require('./routes/venues'));
 
-// ✅ Logs for ENV
+
+// ✅ Environment Logs
 console.log("📦 ENV TEST → EMAIL =", process.env.EMAIL);
 console.log("📦 ENV TEST → PASSWORD =", process.env.PASSWORD ? "Loaded ✅" : "Missing ❌");
 
-// ✉️ Email transporter
+// ✅ Email transporter
 let transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -30,13 +29,13 @@ let transporter = nodemailer.createTransport({
   }
 });
 
-// ✅ Define an endpoint to trigger email manually
+// ✅ Email endpoint
 app.post('/send-notification', (req, res) => {
-  const { to, subject, text } = req.body;  // use req.body data for dynamic email
+  const { to, subject, text } = req.body;
 
   let mailOptions = {
     from: process.env.EMAIL,
-    to: to || 'dr.maher8496@gmail.com',  // fallback email if no `to` provided
+    to: to || 'dr.maher8496@gmail.com',
     subject: subject || 'Team Notification',
     text: text || 'Next match is on May 3!'
   };
@@ -52,6 +51,6 @@ app.post('/send-notification', (req, res) => {
   });
 });
 
-// ✅ Run server
+// ✅ Start server
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

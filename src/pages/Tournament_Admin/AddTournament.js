@@ -1,52 +1,65 @@
 import React, { useState } from 'react';
 import './AddTournament.css';
 import { FaPlus } from 'react-icons/fa';
-import { v4 as uuidv4 } from 'uuid';
 
 const AddTournament = () => {
   const [formData, setFormData] = useState({
+    tr_id: '',
     tr_name: '',
     start_date: '',
     end_date: ''
   });
 
-  const [success, setSuccess] = useState(false); // ✅ NEW STATE
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const tournamentData = {
-      tr_id: uuidv4(),
-      ...formData
-    };
 
-    console.log('Tournament added:', tournamentData);
+    try {
+      const response = await fetch('http://localhost:3001/tournaments/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-    // ✅ Show success message
-    setSuccess(true);
+      const data = await response.json();
 
-    // ✅ Clear the form
-    setFormData({
-      tr_name: '',
-      start_date: '',
-      end_date: ''
-    });
-
-    // ✅ Hide message after 3 seconds
-    setTimeout(() => setSuccess(false), 3000);
+      if (response.ok) {
+        setSuccess(true);
+        setFormData({ tr_id: '', tr_name: '', start_date: '', end_date: '' });
+        setTimeout(() => setSuccess(false), 3000);
+      } else {
+        alert(data.error || 'Error adding tournament');
+      }
+    } catch (err) {
+      console.error('Error submitting:', err);
+      alert('Server error.');
+    }
   };
 
   return (
     <div className="add-tournament-container">
       <div className="form-card">
         <h2 className="form-title">Add New Tournament</h2>
-
         {success && <p className="success-message">✅ Tournament added successfully!</p>}
 
         <form onSubmit={handleSubmit}>
+          <label>Tournament ID</label>
+          <input
+            type="number"
+            name="tr_id"
+            placeholder="Enter tournament ID"
+            value={formData.tr_id}
+            onChange={handleChange}
+            required
+          />
+
           <label>Tournament Name</label>
           <input
             type="text"
@@ -89,4 +102,4 @@ const AddTournament = () => {
   );
 };
 
-export default AddTournament; 
+export default AddTournament;
