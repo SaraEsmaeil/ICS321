@@ -12,8 +12,16 @@ app.use(express.json());
 // ✅ Routes
 app.use('/tournaments', require('./routes/tournaments'));
 app.use('/teams', require('./routes/teams'));
-app.use('/join_requests', require('./routes/join_requests')); // ← Added this line
-app.use('/venues', require('./routes/venues'));
+app.use('/joinRequests', require('./routes/joinRequests'));
+app.use('/matches', require('./routes/matches')); 
+app.use('/stats', require('./routes/stats')); 
+app.use('/players', require('./routes/players'));
+app.use('/captain', require('./routes/captain'));
+app.use('/stats', require('./routes/stats'));
+
+
+
+
 
 
 // ✅ Environment Logs

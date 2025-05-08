@@ -1,85 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AssignCaptain.css';
 
 const AssignCaptain = () => {
-  const [formData, setFormData] = useState({
-    match: '',
-    team: '',
-    player: ''
-  });
+  const [matches, setMatches] = useState([]);
+  const [players, setPlayers] = useState([]);
+  const [formData, setFormData] = useState({ match_no: '', team_id: '', player_id: '' });
 
-  // Mock data (replace with actual API later)
-  const matches = [
-    { match_no: 1, name: 'Match 1 – Falcons vs Tigers', teams: ['Falcons', 'Tigers'] },
-    { match_no: 2, name: 'Match 2 – Eagles vs Wolves', teams: ['Eagles', 'Wolves'] }
-  ];
+  useEffect(() => {
+    fetch('http://localhost:3001/matches/list')
+      .then(res => res.json())
+      .then(setMatches)
+      .catch(console.error);
+  }, []);
 
-  const players = {
-    Falcons: ['Mohammed', 'Ali Hassan'],
-    Tigers: ['Khalid', 'Zayd Khan'],
-    Eagles: ['Sami Omar', 'Saud'],
-    Wolves: ['Yusuf Ali', 'Fahad']
+  const loadPlayers = (teamId) => {
+    fetch(`http://localhost:3001/players/by-team/${teamId}`)
+      .then(res => res.json())
+      .then(setPlayers)
+      .catch(console.error);
   };
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-      ...(name === 'team' ? { player: '' } : {}) // reset player on team change
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'team_id') loadPlayers(value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitted:', formData);
-    alert(`✅ Captain assigned successfully to ${formData.team}`);
-    // TODO: Send to backend (match_captain table)
-  };
 
-  const selectedMatch = matches.find(m => m.match_no.toString() === formData.match);
+    const res = await fetch('http://localhost:3001/captain/assign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await res.json();
+    if (res.ok) alert(data.message);
+    else alert(data.error);
+  };
 
   return (
     <div className="assign-captain-container">
-      <div className="assign-card">
-        <h2>Assign Match Captain</h2>
-        <p>Select a match, then a team, and assign its captain.</p>
-        <form onSubmit={handleSubmit}>
-          <label>Match</label>
-          <select name="match" value={formData.match} onChange={handleChange} required>
-            <option value="">Select a match</option>
-            {matches.map(match => (
-              <option key={match.match_no} value={match.match_no}>{match.name}</option>
-            ))}
-          </select>
+      <h2>Assign Team Captain</h2>
+      <form onSubmit={handleSubmit}>
+        <label>Match</label>
+        <select name="match_no" onChange={handleChange} required>
+          <option value="">Select Match</option>
+          {matches.map(m => (
+            <option key={m.match_no} value={m.match_no}>
+              Match #{m.match_no} – {m.team_id1} vs {m.team_id2}
+            </option>
+          ))}
+        </select>
 
-          {formData.match && (
-            <>
-              <label>Team</label>
-              <select name="team" value={formData.team} onChange={handleChange} required>
-                <option value="">Select a team</option>
-                {selectedMatch.teams.map(team => (
-                  <option key={team} value={team}>{team}</option>
-                ))}
-              </select>
-            </>
-          )}
+        <label>Team ID</label>
+        <input type="number" name="team_id" onChange={handleChange} required />
 
-          {formData.team && (
-            <>
-              <label>Captain</label>
-              <select name="player" value={formData.player} onChange={handleChange} required>
-                <option value="">Select a player</option>
-                {players[formData.team]?.map(player => (
-                  <option key={player} value={player}>{player}</option>
-                ))}
-              </select>
-            </>
-          )}
+        <label>Player</label>
+        <select name="player_id" onChange={handleChange} required>
+          <option value="">Select Player</option>
+          {players.map(p => (
+            <option key={p.player_id} value={p.player_id}>
+              {p.name} (#{p.jersey_no})
+            </option>
+          ))}
+        </select>
 
-          <button type="submit" className="assign-btn">Assign Captain</button>
-        </form>
-      </div>
+        <button type="submit">Assign Captain</button>
+      </form>
     </div>
   );
 };

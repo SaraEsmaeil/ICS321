@@ -30,7 +30,7 @@ const SidebarNav = () => {
           <Link to="/admin/assign-captain"><FaUserTie /> <span>Assign Captain</span></Link>
         </li>
         <li>
-          <Link to="/admin/approve-player"><FaUserCheck /> <span>Approve Player</span></Link>
+          <Link to="/admin/approve-requests"><FaUserCheck /> <span>Approve Player</span></Link>
         </li>
         <li>
           <Link to="/admin/schedule-match"><FaCalendarAlt /> <span>Schedule Match</span></Link>

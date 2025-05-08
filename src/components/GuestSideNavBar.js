@@ -21,12 +21,12 @@ const GuestSideBarNav = () => {
       </div>
       <ul>
         <li>
-          <Link to="/guest/view-tournaments">
+          <Link to="/guest/tournaments">
             <FaTrophy /> <span>View Tournaments</span>
           </Link>
         </li>
         <li>
-          <Link to="/guest/match-results">
+          <Link to="/guest/results">
             <FaFutbol /> <span>Match Results</span>
           </Link>
         </li>
@@ -46,11 +46,10 @@ const GuestSideBarNav = () => {
           </Link>
         </li>
         <li>
-  <Link to="/guest/join-team">
-    <FaUserPlus /> <span>Join a Team</span>
-  </Link>
-</li>
-
+          <Link to="/guest/join">
+            <FaUserPlus /> <span>Join a Team</span>
+          </Link>
+        </li>
       </ul>
     </div>
   );

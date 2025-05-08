@@ -1,110 +1,75 @@
+import React, { useEffect, useState } from 'react';
 import './MatchResults.css';
-// Dummy data
-const matches = [
-    {
-        matchNumber: 1,
-        team1: "Al-Hilal",
-        team2: "Al-Nassr",
-        goals: [
-            { scorer: "Neymar Jr", number: 10, time: 28 },
-            { scorer: "Cristiano Ronaldo", number: 7, time: 63 },
-            { scorer: "Aleksandar Mitrović", number: 9, time: 89 }
-        ]
-    },
-    {
-        matchNumber: 2,
-        team1: "Al-Ittihad",
-        team2: "Al-Ahli",
-        goals: [
-            { scorer: "Karim Benzema", number: 9, time: 15 },
-            { scorer: "Riyad Mahrez", number: 30, time: 51 },
-            { scorer: "Fabinho", number: 3, time: 76 }
-        ]
-    },
-    {
-        matchNumber: 3,
-        team1: "Al-Shabab",
-        team2: "Al-Fateh",
-        goals: [
-            { scorer: "Éver Banega", number: 10, time: 34 },
-            { scorer: "Cristian Tello", number: 11, time: 67 }
-        ]
-    },
-    {
-        matchNumber: 4,
-        team1: "Al-Ettifaq",
-        team2: "Al-Taawoun",
-        goals: [
-            { scorer: "Georginio Wijnaldum", number: 25, time: 42 },
-            { scorer: "Salem Al-Dawsari", number: 29, time: 81 }
-        ]
-    },
-    {
-        matchNumber: 5,
-        team1: "Al-Fayha",
-        team2: "Al-Raed",
-        goals: []
-    }
-];
+
 const MatchResults = () => {
-    return (
-        <div className="match-results-container">
-            <h1 className="page-title">Saudi Pro League Match Results</h1>
-            <div className="matches-grid">
-                {matches.map((match) => (
-                    <div key={match.matchNumber} className="match-card">
-                        <div className="match-header">
-                            <div className="team">
-                               
-                                <span className="team-name">{match.team1}</span>
-                            </div>
-                            
-                            <div className="match-center">
-                                <span className="match-status">FT</span>
-                                <div className="score">
-                                    {match.goals.filter(g => g.team === match.team1).length} - 
-                                    {match.goals.filter(g => g.team === match.team2).length}
-                                </div>
-                                <span className="match-venue">King Fahd Stadium</span>
-                            </div>
-                            
-                            <div className="team">
-                                <span className="team-name">{match.team2}</span>
-        
-                            </div>
-                        </div>
+  const [tournaments, setTournaments] = useState([]);
+  const [selectedTournament, setSelectedTournament] = useState('');
+  const [matches, setMatches] = useState([]);
 
-                        <div className="match-details">
-                            <div className="competition-info">
-                                <span className="competition-name">Saudi Pro League</span>
-                                <span className="match-date">25 March 2024</span>
-                            </div>
-                            
-                            {match.goals.length > 0 ? (
-                                <div className="goals-container">
-                                    <div className="goals-column">
-                                        {match.goals.map((goal, index) => (
-                                            <div key={index} className="goal-event">
-                                                <span className="goal-time">{goal.time}'</span>
-                                                <span className="scorer">
-                                                    {goal.scorer}
-                                                    <span className="player-number">#{goal.number}</span>
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="no-goals">No goals scored in this match</div>
-                            )}
-                        </div>
-                    </div>
-                ))}
+  useEffect(() => {
+    fetch('http://localhost:3001/tournaments/list')
+      .then(res => res.json())
+      .then(data => setTournaments(data))
+      .catch(err => console.error('Error fetching tournaments:', err));
+  }, []);
+
+  const handleTournamentChange = (e) => {
+    const tr_id = e.target.value;
+    setSelectedTournament(tr_id);
+    fetch(`http://localhost:3001/matches/by-tournament/${tr_id}`)
+      .then(res => res.json())
+      .then(data => setMatches(data))
+      .catch(err => console.error('Error fetching match results:', err));
+  };
+
+  return (
+    <div className="match-results-container">
+      <h1 className="page-title">Match Results</h1>
+
+      <label>Select Tournament</label>
+      <select
+        value={selectedTournament}
+        onChange={handleTournamentChange}
+        className="tournament-select"
+      >
+        <option value="">-- Select a Tournament --</option>
+        {tournaments.map(t => (
+          <option key={t.tr_id} value={t.tr_id}>{t.tr_name}</option>
+        ))}
+      </select>
+
+      <div className="matches-grid">
+        {matches.map(match => (
+          <div key={match.match_no} className="match-card">
+            <div className="match-header">
+              <span className="team-name">{match.team1_name}</span>
+              <div className="match-center">
+                <span className="match-status">FT</span>
+                <div className="score">{match.score}</div>
+                <span className="match-date">{new Date(match.play_date).toLocaleDateString()}</span>
+              </div>
+              <span className="team-name">{match.team2_name}</span>
             </div>
-        </div>
-    );
+
+            <div className="match-details">
+              {match.goals.length > 0 ? (
+                <div className="goals-column">
+                  {match.goals.map((goal, index) => (
+                    <div key={index} className="goal-event">
+                      <span className="goal-time">{goal.goal_time}'</span>
+                      <span className="scorer">{goal.player_name} #{goal.jersey_no}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="no-goals">No goals scored in this match</div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
-
-
 
 export default MatchResults;

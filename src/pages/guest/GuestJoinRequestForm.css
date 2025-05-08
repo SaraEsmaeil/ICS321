@@ -1,0 +1,85 @@
+/* Overall page layout */
+.join-request-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #FFFFFF; /* White */
+  padding: 2rem;
+}
+
+/* Card-like box */
+.join-request-card {
+  background-color: #F4F4F4; /* Light Gray */
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  max-width: 500px;
+  width: 100%;
+}
+
+/* Title and subtitle */
+.join-request-title {
+  color: #002B5B; /* Navy Blue */
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.join-request-subtitle {
+  color: #002B5B;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Form layout */
+.join-request-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Form groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Labels */
+.form-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #002B5B;
+}
+
+/* Input fields */
+.form-input {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #FFFFFF;
+  color: #002B5B;
+}
+
+.form-input::placeholder {
+  color: #888;
+}
+
+/* Submit button */
+.submit-button {
+  background-color: #002B5B; /* Navy Blue */
+  color: #FFFFFF;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #00B4D8; /* Sky Blue */
+}
